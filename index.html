@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OSINT WORKSTATION :: Tactical Playbook & Tool Matrix</title>
+  <meta name="description" content="Console investigativa OSINT ad alta densità: procedure operative per task, catalogo strumenti gratuiti, generatore dork e blocco note forense locale.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Console Terminal Header -->
+  <header class="site-header">
+    <div class="header-container">
+      <div class="brand-section">
+        <span class="terminal-prompt-symbol">root@osint:~#</span>
+        <div class="brand-text">
+          <h1>OSINT WORKSTATION <span class="brand-badge">v2.4_CLI</span></h1>
+        </div>
+        <div class="terminal-status-group">
+          <div class="status-indicator">
+            <span class="status-dot"></span>
+            <span>PASSIVE_RECON</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Navigation Tabs with hotkey hints -->
+      <nav class="nav-tabs" role="tablist">
+        <button class="nav-tab-btn active" data-tab="tab-playbooks" id="tab-btn-playbooks">
+          <span class="tab-key-hint">[1]</span>
+          <span>TASK PLAYBOOKS</span>
+        </button>
+        <button class="nav-tab-btn" data-tab="tab-directory" id="tab-btn-directory">
+          <span class="tab-key-hint">[2]</span>
+          <span>TOOLS DIRECTORY</span>
+        </button>
+        <button class="nav-tab-btn" data-tab="tab-dorking" id="tab-btn-dorking">
+          <span class="tab-key-hint">[3]</span>
+          <span>DORK ENGINE</span>
+        </button>
+        <button class="nav-tab-btn" data-tab="tab-opsec" id="tab-btn-opsec">
+          <span class="tab-key-hint">[4]</span>
+          <span>OPSEC PROTOCOL</span>
+        </button>
+        <button class="nav-tab-btn" data-tab="tab-scratchpad" id="tab-btn-scratchpad">
+          <span class="tab-key-hint">[5]</span>
+          <span>EVIDENCE NOTES</span>
+        </button>
+      </nav>
+
+      <!-- Quick Command / Search Input -->
+      <div class="search-bar-header">
+        <i class="bi bi-terminal"></i>
+        <input type="text" id="global-search-input" placeholder="filter tool/task... [/]" autocomplete="off">
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Console Space -->
+  <main class="main-wrapper">
+
+    <!-- Sub-Header Status Console Strip -->
+    <div class="console-strip">
+      <div class="console-strip-left">
+        <span class="strip-item">HOST: <strong>127.0.0.1:3000</strong></span>
+        <span class="strip-item">&bull;</span>
+        <span class="strip-item">DATABASE: <strong id="stat-total-tools">0</strong> TOOLS VERIFIED</span>
+        <span class="strip-item">&bull;</span>
+        <span class="strip-item">PROCEDURES: <strong id="stat-total-playbooks">0</strong> PLAYBOOKS</span>
+        <span class="strip-item">&bull;</span>
+        <span class="strip-item">SOURCE: <strong>OPEN_ACCESS_ONLY</strong></span>
+      </div>
+      <div class="console-strip-right">
+        <span style="color: var(--term-green); font-size: 0.75rem;">HOTKEYS: [1-5] TABS | [/] SEARCH</span>
+      </div>
+    </div>
+
+    <!-- Quick Task Selector Strip -->
+    <div class="quick-task-bar" id="quick-task-bar-strip">
+      <!-- Populated dynamically by app.js -->
+    </div>
+
+    <!-- VIEW 1: TASK PLAYBOOKS -->
+    <section id="tab-playbooks" class="tab-content active">
+      <div class="playbook-layout">
+        <!-- Sidebar Task Selector -->
+        <aside class="playbook-sidebar">
+          <div class="panel-header">
+            <span>&gt; SELECT TARGET TASK</span>
+            <i class="bi bi-crosshair"></i>
+          </div>
+          <div class="task-list" id="task-sidebar-list">
+            <!-- Dynamic task buttons populated by app.js -->
+          </div>
+        </aside>
+
+        <!-- Main Task Console Display -->
+        <div class="playbook-main" id="playbook-details-view">
+          <!-- Dynamic details view populated by app.js -->
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 2: TOOLS DIRECTORY -->
+    <section id="tab-directory" class="tab-content">
+      <div class="dir-control-bar">
+        <div class="dir-search-line">
+          <div class="dir-search-input-box">
+            <i class="bi bi-search"></i>
+            <input type="text" id="dir-search-input" placeholder="Query tool by name, function, source, syntax...">
+          </div>
+          <div class="dir-filter-buttons">
+            <button class="dir-btn active" data-filter="all">[ALL]</button>
+            <button class="dir-btn" data-filter="free">[100% FREE]</button>
+            <button class="dir-btn" data-filter="nologin">[NO LOGIN]</button>
+            <button class="dir-btn" data-filter="web">[WEB GUI]</button>
+            <button class="dir-btn" data-filter="cli">[TERMINAL CLI]</button>
+            <button class="dir-btn" data-filter="favorites" id="btn-show-favorites">
+              <i class="bi bi-star-fill text-warning"></i> [BOOKMARKS]
+            </button>
+          </div>
+        </div>
+
+        <!-- Category Line -->
+        <div class="cat-filter-line" id="category-pills-container">
+          <!-- Populated dynamically by app.js -->
+        </div>
+      </div>
+
+      <!-- Results Info -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; font-size: 0.75rem; color: var(--term-text-muted);">
+        <span id="results-count-label">INDEXING TOOLS...</span>
+        <span style="color: var(--term-green);">&gt; REALTIME FILTERING ACTIVE</span>
+      </div>
+
+      <!-- Tools Dense Grid -->
+      <div class="tools-dense-grid" id="tools-cards-container">
+        <!-- Cards populated dynamically by app.js -->
+      </div>
+    </section>
+
+    <!-- VIEW 3: DORK GENERATOR -->
+    <section id="tab-dorking" class="tab-content">
+      <div class="dork-grid-layout">
+        <!-- Inputs Box -->
+        <div class="terminal-box">
+          <div class="panel-header">
+            <span>&gt; GOOGLE DORK BUILDER</span>
+            <i class="bi bi-sliders"></i>
+          </div>
+
+          <div class="form-row">
+            <label for="dork-domain-input">TARGET DOMAIN (site:)</label>
+            <input type="text" id="dork-domain-input" placeholder="target.com">
+          </div>
+
+          <div class="form-row">
+            <label for="dork-keyword-input">KEYWORD / PERSON / TERM</label>
+            <input type="text" id="dork-keyword-input" placeholder="confidential, Mario Rossi, password...">
+          </div>
+
+          <div class="form-row">
+            <label for="dork-filetype-select">FILE EXTENSION FILTER (filetype:)</label>
+            <select id="dork-filetype-select">
+              <option value="">[NO FILETYPE FILTER]</option>
+              <option value="pdf">pdf (Documents / Invoices)</option>
+              <option value="xlsx OR ext:xls OR ext:csv">xlsx / xls / csv (Data Sheets)</option>
+              <option value="docx OR ext:doc">docx / doc (Text Records)</option>
+              <option value="env OR ext:conf OR ext:ini">env / conf / ini (API Keys & Passwords)</option>
+              <option value="sql OR ext:bak OR ext:dump">sql / bak / dump (Database Backups)</option>
+              <option value="log">log (Server Logs)</option>
+            </select>
+          </div>
+
+          <div style="font-size: 0.75rem; color: var(--term-green); margin-top: 1rem; margin-bottom: 0.4rem; font-weight: 700;">
+            &gt; RAPID ATTACK PRESETS:
+          </div>
+          <div class="preset-strip" id="dork-presets-container">
+            <!-- Dynamic presets from data.js -->
+          </div>
+        </div>
+
+        <!-- Output Box -->
+        <div class="terminal-box">
+          <div class="panel-header">
+            <span>&gt; GENERATED SEARCH DORK</span>
+            <i class="bi bi-terminal"></i>
+          </div>
+
+          <div class="dork-output-screen" id="dork-result-text">
+            Waiting for target input parameters...
+          </div>
+
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <button class="btn-term-action" id="btn-copy-dork">
+              <i class="bi bi-clipboard-check"></i>
+              <span>[COPY DORK QUERY]</span>
+            </button>
+            <a href="#" target="_blank" rel="noopener noreferrer" class="btn-term-action" id="btn-execute-google">
+              <i class="bi bi-box-arrow-up-right"></i>
+              <span>[RUN QUERY ON GOOGLE]</span>
+            </a>
+          </div>
+
+          <div style="margin-top: 1.5rem; padding: 0.75rem; background: var(--term-bg); border: 1px solid var(--term-border); border-left: 2px solid var(--term-amber); font-size: 0.75rem; color: var(--term-text-muted);">
+            <strong style="color: var(--term-amber);">&gt; OPSEC ADVISORY:</strong> Se Google genera CAPTCHA frequenti, inserisci intervalli di attesa o esegui le medesime dorks su <strong>Bing</strong> o <strong>DuckDuckGo</strong> tramite VPN/Tor.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 4: OPSEC PROTOCOL -->
+    <section id="tab-opsec" class="tab-content">
+      <div class="opsec-terminal-grid">
+        <!-- Checklist Box -->
+        <div class="terminal-box">
+          <div class="panel-header">
+            <span>&gt; OPSEC READINESS VERIFICATION</span>
+            <i class="bi bi-shield-check"></i>
+          </div>
+          <p style="font-size: 0.75rem; color: var(--term-text-muted); margin-bottom: 0.75rem;">
+            Verifica questi passaggi di sicurezza prima di interagire o scansionare il bersaglio:
+          </p>
+          <div class="checklist-items" id="opsec-checklist-items">
+            <!-- Dynamically populated from data.js -->
+          </div>
+        </div>
+
+        <!-- Sock Puppet Rules Box -->
+        <div class="terminal-box">
+          <div class="panel-header">
+            <span>&gt; SOCK PUPPET COVERT PROTOCOLS</span>
+            <i class="bi bi-incognito"></i>
+          </div>
+          <p style="font-size: 0.75rem; color: var(--term-text-muted); margin-bottom: 0.75rem;">
+            Regole ferree per la gestione di identità fittizie durante le investigazioni:
+          </p>
+          <ul class="opsec-rules-terminal">
+            <li>
+              <i class="bi bi-terminal"></i>
+              <span><strong>ISOLAMENTO COMPLETO:</strong> Nessun login contestuale tra identità reale e sock puppet sulla stessa istanza del browser.</span>
+            </li>
+            <li>
+              <i class="bi bi-terminal"></i>
+              <span><strong>AVATAR AI ANTI-REVERSE:</strong> I volti generati da AI vanno ritagliati, specchiati o filtrati per impedire match nei motori di ricerca biometrici.</span>
+            </li>
+            <li>
+              <i class="bi bi-terminal"></i>
+              <span><strong>NUMERAZIONE ESTERA / DISPOSABLE:</strong> Usa numeri SIM prepagate o servizi VoIP anonimi per attivare account di messaggistica.</span>
+            </li>
+            <li>
+              <i class="bi bi-terminal"></i>
+              <span><strong>BROWSER FINGERPRINT DEFENSE:</strong> Utilizza macchine virtuali su VirtualBox (es. Tsurugi Linux) o profili dedicati di Brave/Firefox.</span>
+            </li>
+            <li>
+              <i class="bi bi-terminal"></i>
+              <span><strong>AGING (INVECCHIAMENTO):</strong> Crea gli account con almeno 2-3 settimane di anticipo prima di avviare ricerche intensive sui target.</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 5: SCRATCHPAD & EVIDENCE NOTES -->
+    <section id="tab-scratchpad" class="tab-content">
+      <div class="scratchpad-terminal-box">
+        <div class="scratchpad-toolbar-line">
+          <div>
+            <div class="panel-header" style="margin-bottom: 0.2rem; border-bottom: none; padding-bottom: 0;">
+              <span>&gt; CASE EVIDENCE LOG & INVESTIGATIVE SCRATCHPAD</span>
+            </div>
+            <span style="font-size: 0.72rem; color: var(--term-text-dim);">
+              Memorizzazione crittografata esclusivamente nel LocalStorage del browser (zero server transmission).
+            </span>
+          </div>
+          <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+            <button class="btn-term-action" id="btn-insert-timestamp">
+              <i class="bi bi-clock"></i> [TIMESTAMP]
+            </button>
+            <button class="btn-term-action" id="btn-export-notes">
+              <i class="bi bi-download"></i> [EXPORT MARKDOWN]
+            </button>
+            <button class="btn-term-action" id="btn-clear-notes" style="color: var(--term-red); border-color: rgba(255, 51, 68, 0.4);">
+              <i class="bi bi-trash"></i> [PURGE]
+            </button>
+          </div>
+        </div>
+
+        <textarea id="scratchpad-textarea" class="scratchpad-editor" placeholder="[+] CASE DOSSIER #2026-OSINT
+Target: 
+Objective: 
+Operator: 
+
+[TIMELINE & ACTIONS]
+- "></textarea>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div>
+      [ OSINT WORKSTATION ] &bull; Playbooks & Tools Architecture &bull; 
+      Riferimento metodologico: <a href="OSINT_FRAMEWORK.md" target="_blank">[OSINT_FRAMEWORK.md]</a> &bull;
+      Istruzioni AI: <a href="AI_SYSTEM_INSTRUCTIONS.md" target="_blank">[AI_SYSTEM_INSTRUCTIONS.md]</a>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
